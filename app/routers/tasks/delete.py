@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
 from fastapi import HTTPException
 from app.utils.get import get_task
+from app.utils.delete import delete_object
 
 
 router = APIRouter()
@@ -19,11 +20,9 @@ async def delete_task(
     db: AsyncSession = Depends(get_db)
 ):
     task = await get_task(db=db, id=task_id)
-    
     if not task:
         raise HTTPException(status_code=404, detail="Task not found or you do not have permission to delete it.")
     
-    await db.delete(task)
-    await db.commit()
+    await delete_object(task, db=db)
     
     return RedirectResponse(url="/dashboard/tasks", status_code=303)

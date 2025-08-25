@@ -11,6 +11,7 @@ from app.models.message import Message
 from app.utils.get import get_message, get_task
 from app.utils.create import create_message
 from app.utils.update import task_update
+from app.utils.delete import delete_object
 
 
 router = APIRouter()
@@ -33,16 +34,14 @@ async def reject_message(message_id: int, request: Request, db: AsyncSession = D
     if message.task_id:
         task = await get_task(db=db, id=message.task_id)
 
-        new_message = Message(
-            sender_id=message.receiver_id,
-            receiver_id=message.sender_id,
-            title=f'User {user.username} did not accept your task "{task.title}"'
-        )
-        db.add(new_message)
-        await db.delete(task)
-    
-    await db.delete(message)
-    await db.commit()
+        await create_message(sender_id=message.receiver_id, 
+                             receiver_id=message.sender_id, 
+                             title=f'User {user.username} did not accept your task "{task.title}"', db=db)
+        
+        await delete_object(message, db=db)
+        await delete_object(task, db=db)
+    else:
+        await delete_object(message, db=db)
     
     return RedirectResponse(url="/dashboard/tasks", status_code=303)
 
@@ -61,8 +60,5 @@ async def accept_message(message_id: int, request: Request, db: AsyncSession = D
                              receiver_id=message.sender_id, 
                              title=f"User {user.username} accept your task {task.title}")
         
-    await db.delete(message)
-    await db.commit()
-
-    
+    await delete_object(message, db=db)
     return RedirectResponse(url="/dashboard/tasks", status_code=303)
