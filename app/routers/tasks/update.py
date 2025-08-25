@@ -11,6 +11,7 @@ from app.models.task import Task
 from sqlalchemy.future import select
 from datetime import datetime
 from app.schemas import TaskSchema
+from app.db.utils import get_task
 
 
 router = APIRouter()
@@ -20,11 +21,7 @@ templates = Jinja2Templates(directory="app/templates")
 @router.get("/task/update/{task_id}", response_class=HTMLResponse)
 async def update_task(request: Request, task_id: int, db: AsyncSession = Depends(get_db)):
     user = await try_get_user(request, db)
-    
-    task = await db.execute(
-        select(Task).where(Task.id == task_id, Task.user_id == user.id)
-    )
-    task = task.scalar_one_or_none()
+    task = await get_task(db=db, id=task_id)
     
     return templates.TemplateResponse("work_space/update_task.html", {"request": request, "user": user, "task": task})
 
@@ -37,12 +34,7 @@ async def update_task(
     db: AsyncSession = Depends(get_db),
     request: Request = None
 ):
-    user = await try_get_user(request, db)
-    
-    task = await db.execute(
-        select(Task).where(Task.id == task_id, Task.user_id == user.id)
-    )
-    task = task.scalar_one_or_none()
+    task = await get_task(db=db, id=task_id)
     
     due_dt = None
     if date.due_date:

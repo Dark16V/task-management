@@ -14,6 +14,7 @@ from datetime import datetime
 from app.schemas import TaskSchema, CreateTaskForFriendSchema
 from app.models.users import User
 from app.models.message import Message
+from app.db.utils import get_task, get_message, get_user
 
 
 
@@ -54,18 +55,12 @@ async def create_task(
 
 
 
-@router.patch('/task/complete/{task_id}', response_class=HTMLResponse)
+@router.post('/task/complete/{task_id}', response_class=HTMLResponse)
 async def complete_task(
-    request: Request,
     task_id: int,
     db: AsyncSession = Depends(get_db)
 ):
-    user = await try_get_user(request, db)
-    
-    task = await db.execute(
-        select(Task).where(Task.id == task_id, Task.user_id == user.id)
-    )
-    task = task.scalar_one_or_none()
+    task = await get_task(db=db, id=task_id)
     
     task.completed = True
     await db.commit()
@@ -81,11 +76,7 @@ async def view_task(
     now: datetime = datetime.utcnow()
 ):
     user = await try_get_user(request, db)
-    
-    task = await db.execute(
-        select(Task).where(Task.id == task_id, Task.user_id == user.id)
-    )
-    task = task.scalar_one_or_none()
+    task = await get_task(db=db, id=task_id)
     
     return templates.TemplateResponse("work_space/view_task.html", {"request": request, "user": user, "task": task, "now": now})
 
@@ -106,13 +97,11 @@ async def add_task_for_friend(
     request: Request = None):
 
     user = await try_get_user(request, db)
-    friend = await db.execute(select(User).where(User.username == data.username))
-    friend = friend.scalar_one_or_none()
-    
+    friend = await get_user(db=db, username=data.username)
+
     due_dt = None
     if data.due_date:  
         due_dt = datetime.strptime(data.due_date, "%Y-%m-%dT%H:%M")
-
 
 
     new_task = Task(

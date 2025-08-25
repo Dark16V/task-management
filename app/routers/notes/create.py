@@ -10,7 +10,7 @@ from app.auth.utils import try_get_user
 from app.models.note import Note
 from sqlalchemy.future import select
 from app.schemas import NoteSchema
-
+from app.db.utils import get_note
 
 
 router = APIRouter()
@@ -42,9 +42,7 @@ async def create_note(
 @router.get("/note/{note_id}", response_class=HTMLResponse)
 async def view_note(request: Request, note_id: int, db: AsyncSession = Depends(get_db)):
     user = await try_get_user(request, db)
-    
-    note = await db.execute(select(Note).where(Note.id == note_id, Note.user_id == user.id))
-    note = note.scalar_one_or_none()
+    note = await get_note(db=db, id=note_id)
     
     if not note:
         return RedirectResponse(url="/dashboard/notes", status_code=404)

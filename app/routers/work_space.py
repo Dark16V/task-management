@@ -13,7 +13,7 @@ from sqlalchemy.future import select
 from datetime import datetime
 from app.models.message import Message
 from sqlalchemy import and_
-
+from app.db.utils import get_message, get_note, get_task
 
 
 router = APIRouter()
@@ -34,28 +34,19 @@ async def root(request: Request, db: AsyncSession = Depends(get_db)):
 async def notes(request: Request, db: AsyncSession = Depends(get_db)):
     user = await try_get_user(request, db)
 
-    message = await db.execute(
-        select(Message).where(Message.receiver_id == user.id).order_by(Message.date.desc()))
-    notes = await db.execute(
-        select(Note).where(Note.user_id == user.id)
-    )
+    message = await get_message(db=db, receiver=user.id)
+    notes = await get_note(db=db, user_id=user.id)
+
     return templates.TemplateResponse("work_space/notes.html",
-                                      {"request": request, "user": user, "notes": notes.scalars().all(), "messages": message.scalars().all()})
+                                      {"request": request, "user": user, "notes": notes, "messages": message})
 
 
 @router.get("/dashboard/tasks", response_class=HTMLResponse)
 async def tasks(request: Request, db: AsyncSession = Depends(get_db), now = datetime.utcnow()):
     user = await try_get_user(request, db)
-    tasks = await db.execute(
-        select(Task).where(
-    and_(
-        Task.user_id == user.id,
-        Task.visible == True)
-        )   
-    )
 
-    message = await db.execute(
-        select(Message).where(Message.receiver_id == user.id).order_by(Message.date.desc()))
+    tasks = await get_task(db=db, user_id=user.id, visible=True)
+    message = await get_message(db=db, receiver=user.id)
 
     return templates.TemplateResponse("work_space/tasks.html",
-                                      {"request": request, "user": user, 'tasks': tasks.scalars().all(), 'now': now, "messages": message.scalars().all()})
+                                      {"request": request, "user": user, 'tasks': tasks, 'now': now, "messages": message})

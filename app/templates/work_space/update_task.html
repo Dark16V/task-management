@@ -21,6 +21,40 @@
   </form>
   <p><a href="{{ request.url_for('tasks') }}">← Back to Tasks</a></p>
 </div>
-<script src="{{ url_for('static', path='js/edit_task.js') }}"></script>
+
+<script>
+const form = document.getElementById('taskForm');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const data = {
+        title: form.title.value,
+        description: form.description.value,
+        due_date: form.due_date.value ? new Date(form.due_date.value).toISOString() : null
+    };
+
+    try {
+        const response = await fetch("{{ request.url_for('update_task', task_id=task.id) }}", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            window.location.href = "{{ request.url_for('tasks') }}";
+        } else {
+            const result = await response.json().catch(() => ({ detail: 'Unknown error' }));
+            alert(result.detail || "Error updating task");
+        }
+    } catch (error) {
+        console.error('Network error:', error);
+        alert('Network error: ' + error.message);
+    }
+});
+</script>
 </body>
 </html>

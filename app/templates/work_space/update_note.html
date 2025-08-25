@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Update Note</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/update_note.css') }}">
+</head>
+<body>
+  <div class="wrap">
+    <h1>Update Note</h1>
+    <form id="updateNoteForm">
+      <label for="title">Title</label>
+      <input type="text" id="title" name="title" placeholder="Title" value="{{ note.title }}" required />
+
+      <label for="content">Content</label>
+      <textarea id="content" name="content" placeholder="Note content" required>{{ note.content }}</textarea>
+      
+      <div class="actions">
+        <a class="btn ghost" href="{{ request.url_for('notes') }}">Back</a>
+        <button class="btn primary" type="submit">Update</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+  const form = document.getElementById('updateNoteForm');
+
+  form.addEventListener('submit', async e => {
+      e.preventDefault();
+
+      const data = {
+          title: form.title.value.trim(),
+          content: form.content.value.trim()
+      };
+
+      try {
+          const response = await fetch("{{ request.url_for('update_note', note_id=note.id) }}", {
+              method: "POST",
+              headers: { 
+                  "Content-Type": "application/json",
+                  "Accept": "application/json"
+              },
+              body: JSON.stringify(data)
+          });
+
+          if (response.ok) {
+              window.location.href = "{{ request.url_for('notes') }}";
+          } else {
+              const result = await response.json().catch(() => ({ detail: 'Unknown error' }));
+              alert(result.detail || "Error while updating note");
+          }
+      } catch (error) {
+          console.error('Network error:', error);
+          alert('Network error: ' + error.message);
+      }
+  });
+  </script>
+</body>
+</html>

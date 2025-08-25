@@ -10,7 +10,7 @@ from app.auth.utils import try_get_user
 from app.models.task import Task
 from sqlalchemy.future import select
 from fastapi import HTTPException
-
+from app.db.utils import get_task
 
 
 router = APIRouter()
@@ -23,12 +23,7 @@ async def delete_task(
     task_id: int,
     db: AsyncSession = Depends(get_db)
 ):
-    user = await try_get_user(request, db)
-    
-    task = await db.execute(
-        select(Task).where(Task.id == task_id, Task.user_id == user.id)
-    )
-    task = task.scalar_one_or_none()
+    task = await get_task(db=db, id=task_id)
     
     if not task:
         raise HTTPException(status_code=404, detail="Task not found or you do not have permission to delete it.")

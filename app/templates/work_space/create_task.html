@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Add Task for Myself</title>
 <link rel="stylesheet" href="{{ url_for('static', path='css/create_task.css') }}">
+<script src="{{ url_for('static', path='js/create_task.js') }}"></script>
 </head>
 <body>
 <div class="wrap">
-    <a class="top-btn" href="{{ request.url_for('create_task_for_friend') }}">+ Create task for friend</a>
+    <a class="top-btn" method="post" href="{{ request.url_for('create_task_for_friend') }}">+ Create task for friend</a>
     <h1>New Task (for Myself)</h1>
 
-    <form id="createTaskForm">
+    <form id="createTaskForm" action="/task/create">
         <label for="title">Title</label>
         <input type="text" id="title" name="title" placeholder="Title" required />
 
@@ -26,6 +27,5 @@
 
     <p class="back-link"><a href="{{ request.url_for('tasks') }}">← Back to tasks</a></p>
 </div>
-<script src="{{ url_for('static', path='js/create_task.js') }}"></script>
 </body>
 </html>

@@ -9,6 +9,7 @@ from app.db.database import get_db
 from app.auth.utils import try_get_user
 from app.models.note import Note
 from sqlalchemy.future import select
+from app.db.utils import get_note
 
 
 router = APIRouter()
@@ -16,11 +17,8 @@ templates = Jinja2Templates(directory="app/templates")
 
 
 @router.post('/note/delete/{note_id}', response_class=HTMLResponse)
-async def delete_note(request: Request, note_id: int, db: AsyncSession = Depends(get_db)):
-    user = await try_get_user(request, db)
-    
-    note = await db.execute(select(Note).where(Note.id == note_id, Note.user_id == user.id))
-    note = note.scalar_one_or_none()
+async def delete_note(note_id: int, db: AsyncSession = Depends(get_db)):
+    note = await get_note(db=db, id=note_id)
     
     if not note:
         return RedirectResponse(url="/dashboard/notes", status_code=404)

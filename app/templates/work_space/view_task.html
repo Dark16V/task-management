@@ -26,7 +26,7 @@
           <button class="btn danger" type="submit">Delete</button>
         </form>
         {% if not task.completed %}
-        <form method="patch" action="{{ request.url_for('complete_task', task_id=task.id) }}">
+        <form method="post" action="{{ request.url_for('complete_task', task_id=task.id) }}">
           <button class="btn success" type="submit">✅ Complete</button>
         </form>
         {% endif %}
