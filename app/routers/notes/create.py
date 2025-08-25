@@ -9,7 +9,7 @@ from app.db.database import get_db
 from app.auth.utils import try_get_user
 from app.schemas import NoteSchema
 from app.utils.get import get_note
-from app.utils.create import create_note
+from app.utils.create import create_note as crt_note
 
 
 router = APIRouter()
@@ -31,7 +31,7 @@ async def create_note(
 ):
     user = await try_get_user(request, db)
     
-    await create_note(db=db, user_id=user.id, title=data.title, content=data.content)
+    await crt_note(user.id, data.title, data.content, db=db)
     
     return RedirectResponse(url="/dashboard/notes", status_code=303)
 

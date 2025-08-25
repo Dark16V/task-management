@@ -11,7 +11,7 @@ from datetime import datetime
 from datetime import datetime
 from app.schemas import TaskSchema, CreateTaskForFriendSchema
 from app.utils.get import get_task, get_user
-from app.utils.create import create_task, create_message
+from app.utils.create import create_task as crt_task, create_message
 
 
 
@@ -37,7 +37,7 @@ async def create_task(
     if data.due_date:  
         due_dt = datetime.strptime(data.due_date, "%Y-%m-%dT%H:%M")
 
-    await create_task(db=db, user_id=user.id, title=data.title, description=data.description, due_dt=due_dt)
+    await crt_task(db=db, user_id=user.id, title=data.title, description=data.description, due_date=due_dt)
 
     return RedirectResponse(url="/dashboard/tasks", status_code=303)
 
@@ -91,12 +91,13 @@ async def add_task_for_friend(
     if data.due_date:  
         due_dt = datetime.strptime(data.due_date, "%Y-%m-%dT%H:%M")
 
-    new_task = await create_task(db=db, 
+    new_task = await crt_task(db=db, 
                                  user_id=user.id, 
                                  from_user_id=friend.id, 
                                  title=data.title, 
                                  description=data.description, 
-                                 due_dt=due_dt, visible=False)
+                                 due_date=due_dt, 
+                                 visible=False)
 
     await db.refresh(new_task)
     await create_message(db=db, 
