@@ -48,10 +48,13 @@ async def get_note(id: int = None, user_id: int = None, db: AsyncSession = Depen
         return note.scalars().all()
     
 
-async def get_user(id: int = None, username: str = None, db: AsyncSession = Depends(get_db)):
+async def get_user(id: int = None, username: str = None, email: str = None, db: AsyncSession = Depends(get_db)):
     if id:
         user = await db.execute(select(User).where(User.id==id))
         return user.scalar_one_or_none()
     if username:
         user = await db.execute(select(User).where(User.username == username))
+        return user.scalar_one_or_none()
+    if email:
+        user = await db.execute(select(User).where(User.email==email))
         return user.scalar_one_or_none()

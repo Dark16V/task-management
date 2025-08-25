@@ -7,10 +7,9 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
 from app.auth.utils import try_get_user
-from app.models.task import Task
-from sqlalchemy.future import select
 from app.models.message import Message
-from app.db.utils import get_message, get_task
+from app.utils.get import get_message, get_task
+from app.utils.create import create_message
 
 
 router = APIRouter()
@@ -57,13 +56,11 @@ async def accept_message(message_id: int, request: Request, db: AsyncSession = D
         task = await get_task(db=db, id=message.task_id)
         task.visible = True
 
-        new_message = Message(
-            sender_id=message.receiver_id,
-            receiver_id=message.sender_id,
-            title=f"User {user.username} accept your task {task.title}"
-        )
-        db.add(new_message)
-
+        await create_message(db=db, 
+                             sender_id=message.receiver_id, 
+                             receiver_id=message.sender_id, 
+                             title=f"User {user.username} accept your task {task.title}")
+        
     await db.delete(message)
     await db.commit()
 

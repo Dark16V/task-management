@@ -7,11 +7,9 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
 from app.auth.utils import try_get_user
-from app.models.task import Task
-from sqlalchemy.future import select
 from datetime import datetime
 from app.schemas import TaskSchema
-from app.db.utils import get_task
+from app.utils.get import get_task
 
 
 router = APIRouter()
@@ -31,8 +29,7 @@ async def update_task(request: Request, task_id: int, db: AsyncSession = Depends
 async def update_task(
     task_id: int,
     date: TaskSchema,
-    db: AsyncSession = Depends(get_db),
-    request: Request = None
+    db: AsyncSession = Depends(get_db)
 ):
     task = await get_task(db=db, id=task_id)
     

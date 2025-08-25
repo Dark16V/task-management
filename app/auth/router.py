@@ -12,8 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.users import User  
 from app.auth.utils import authenticate_user, create_access_token
-from fastapi import Form
 from app.auth.schemas import RegisterSchema
+from app.utils.get import get_user
 
 
 router = APIRouter(tags=["auth"])
@@ -50,16 +50,15 @@ async def register(
             detail="Passwords do not match"
         )
 
-    result = await db.execute(select(User).where(User.email == data.email))
-    existing_user = result.scalar_one_or_none()
+
+    existing_user = await get_user(db=db, email=data.email)
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email is already registered"
         )
 
-    result = await db.execute(select(User).where(User.username == data.username))
-    existing_user = result.scalar_one_or_none()
+    existing_user = await get_user(db=db, username=data.username)
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -7,14 +7,11 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
 from app.auth.utils import try_get_user
-from app.models.task import Task
-from sqlalchemy.future import select
 from datetime import datetime
 from datetime import datetime
 from app.schemas import TaskSchema, CreateTaskForFriendSchema
-from app.models.users import User
-from app.models.message import Message
-from app.db.utils import get_task, get_message, get_user
+from app.utils.get import get_task, get_user
+from app.utils.create import create_task, create_message
 
 
 
@@ -36,21 +33,12 @@ async def create_task(
     request: Request = None
 ):
     user = await try_get_user(request, db)
-    
     due_dt = None
     if data.due_date:  
         due_dt = datetime.strptime(data.due_date, "%Y-%m-%dT%H:%M")
 
-    new_task = Task(
-        user_id=user.id,
-        title=data.title,
-        description=data.description,
-        due_date=due_dt
-    )
-    
-    db.add(new_task)
-    await db.commit()
-    
+    await create_task(db=db, user_id=user.id, title=data.title, description=data.description, due_dt=due_dt)
+
     return RedirectResponse(url="/dashboard/tasks", status_code=303)
 
 
@@ -103,28 +91,18 @@ async def add_task_for_friend(
     if data.due_date:  
         due_dt = datetime.strptime(data.due_date, "%Y-%m-%dT%H:%M")
 
+    new_task = await create_task(db=db, 
+                                 user_id=user.id, 
+                                 from_user_id=friend.id, 
+                                 title=data.title, 
+                                 description=data.description, 
+                                 due_dt=due_dt, visible=False)
 
-    new_task = Task(
-        user_id=user.id,  
-        from_user_id=friend.id, 
-        title=data.title,
-        description=data.description,
-        due_date=due_dt,
-        visible=False
-    )
-    
-    db.add(new_task)
-    await db.commit()
     await db.refresh(new_task)
-
-    new_message = Message(
-        sender_id=user.id,
-        receiver_id=friend.id,
-        title=f"{data.username} wants to give you a task:{data.title}",
-        task_id = new_task.id
-    )
-
-    db.add(new_message)
-    await db.commit()
+    await create_message(db=db, 
+                         sender_id=user.id, 
+                         receiver_id=friend.id, 
+                         title=f"{data.username} wants to give you a task:{data.title}", 
+                         task_id=new_task.id)
     
     return RedirectResponse(url="/dashboard/tasks", status_code=303)

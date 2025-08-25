@@ -7,10 +7,9 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
 from app.auth.utils import try_get_user
-from app.models.note import Note
-from sqlalchemy.future import select
 from app.schemas import NoteSchema
-from app.db.utils import get_note
+from app.utils.get import get_note
+from app.utils.create import create_note
 
 
 router = APIRouter()
@@ -32,9 +31,7 @@ async def create_note(
 ):
     user = await try_get_user(request, db)
     
-    new_note = Note(title=data.title, content=data.content, user_id=user.id)
-    db.add(new_note)
-    await db.commit()
+    await create_note(db=db, user_id=user.id, title=data.title, content=data.content)
     
     return RedirectResponse(url="/dashboard/notes", status_code=303)
 
