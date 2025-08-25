@@ -43,6 +43,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 async def try_get_user(request: Request | WebSocket, db: AsyncSession = Depends(get_db)):
     try:
         token = request.cookies.get("Authorization")
+        if not token:
+            return None 
         payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=[os.getenv("ALGORITHM")])
         username = payload.get("sub")
         if username is None:
