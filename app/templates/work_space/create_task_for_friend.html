@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Add Task for Friend</title>
+<link rel="stylesheet" href="{{ url_for('static', path='css/add_task_friend.css') }}">
+</head>
+<body>
+<div class="wrap">
+    <a class="top-btn" href="{{ request.url_for('add_task') }}">+ Create task for myself</a>
+    <h1>New Task (for Friend)</h1>
+
+    <form id="createTaskFormFriend">
+        <label for="friend_username">Friend's Username</label>
+        <input type="text" id="friend_username" name="friend_username" placeholder="Friend's username" required />
+
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" placeholder="Title" required />
+
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="5" placeholder="Task description"></textarea>
+
+        <label for="due_date">Due Date</label>
+        <input type="datetime-local" id="due_date" name="due_date" />
+
+        <button type="submit">Create</button>
+    </form>
+
+    <p class="back-link"><a href="{{ request.url_for('tasks') }}">← Back to tasks</a></p>
+</div>
+<script src="{{ url_for('static', path='js/add_task_friend.js') }}"></script>
+</body>
+</html>

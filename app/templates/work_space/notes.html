@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ title or 'Notes Board' }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/notes.css') }}">
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1 style="margin:0">Notes Board</h1>
+        <div class="small">All your records in one place</div>
+      </div>
+
+      <div class="controls">
+        <nav class="tabs" aria-label="Navigation">
+          <a class="tab active" href="{{ request.url_for('notes') }}">Notes</a>
+          <a class="tab" href="{{ request.url_for('tasks') }}">Tasks</a>
+        </nav>
+
+        <a class="btn ghost" href="{{ request.url_for('add_note') }}">Add Note</a>
+        <form method="get" action="{{ request.url_for('logout') }}">
+          <button class="btn" type="submit">Logout</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div>
+        {% if notes and notes|length > 0 %}
+          <div class="grid" id="notes-grid">
+            {% for note in notes %}
+              <article class="card">
+                <div>
+                  <h3>{{ note.title[:15] ~ ('...' if note.title|length > 15 else '') }}</h3>
+                  <div class="meta">{{ note.created_at }}</div>
+                  <div class="content">{{ note.content[:150] ~ ('...' if note.content|length > 150 else '') }}</div>
+                </div>
+                <div class="row-actions">
+                  <a class="btn ghost" href="{{ request.url_for('view_note', note_id=note.id) }}">👁</a>
+                  <form method="post" action="{{ request.url_for('delete_note', note_id=note.id) }}" onsubmit="return confirm('Delete note?')">
+                    <button class="btn danger" type="submit">✕</button>
+                  </form>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty">
+            <p>You don’t have any notes yet. Click “Add Note” to create your first one.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <aside class="messages-panel">
+        <h3>Messages</h3>
+        {% if messages and messages|length > 0 %}
+          {% for msg in messages %}
+            <div class="message-item" onclick="location.href='/view/message/{{ msg.id }}'">
+              <div class="msg-title">{{ msg.title[:20] ~ ('...' if msg.title|length > 20 else '') }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="small">No messages</div>
+        {% endif %}
+      </aside>
+    </div>
+  </div>
+</body>
+</html>

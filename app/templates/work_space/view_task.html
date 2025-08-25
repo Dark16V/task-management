@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ task.title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/view_task.css') }}">
+</head>
+<body>
+  <div class="wrap">
+    <article class="card">
+      <div class="meta">Created: {{ task.created }}</div>
+      {% if task.due_date %}
+        {% set remaining = task.due_date - now %}
+        <div class="meta">Time left: {{ remaining.days }} days {{ remaining.seconds // 3600 }} hours</div>
+      {% endif %}
+      <div class="meta">Status: {% if task.completed %}✅ Completed{% else %}⏳ In Progress{% endif %}</div>
+
+      <h2>{{ task.title }}</h2>
+      <div class="content">{{ task.description }}</div>
+
+      <div class="buttons">
+        <a class="btn ghost" href="{{ request.url_for('tasks') }}">← Back</a>
+        <a class="btn primary" href="{{ request.url_for('update_task', task_id=task.id) }}">Update</a>
+        <form method="post" action="{{ request.url_for('delete_task', task_id=task.id) }}" onsubmit="return confirm('Delete task?')">
+          <button class="btn danger" type="submit">Delete</button>
+        </form>
+        {% if not task.completed %}
+        <form method="patch" action="{{ request.url_for('complete_task', task_id=task.id) }}">
+          <button class="btn success" type="submit">✅ Complete</button>
+        </form>
+        {% endif %}
+      </div>
+    </article>
+  </div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Главная</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 0; display: grid; place-items: center; min-height: 100vh; background:#f6f7f9; }
+    .card { background: #fff; padding: 28px; border-radius: 16px; box-shadow: 0 10px 24px rgba(0,0,0,.08); width: min(92vw, 420px); text-align: center; }
+    h1 { margin: 0 0 12px; font-size: 22px; }
+    p { margin: 0 0 20px; color:#555; }
+    .actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .btn { appearance:none; border:none; padding:12px 18px; border-radius:12px; text-decoration:none; cursor:pointer; font-weight:600; }
+    .btn-primary { background:#2563eb; color:#fff; }
+    .btn-outline { background:#fff; color:#2563eb; outline:2px solid #2563eb; }
+    .btn:focus-visible { outline:3px solid #111; outline-offset:2px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Добро пожаловать</h1>
+    <p>Создай аккаунт или войди, чтобы продолжить.</p>
+
+    <div class="actions">
+      <a class="btn btn-primary" href="{{ request.url_for('register_page') }}">Зарегистрироваться</a>
+      <a class="btn btn-outline" href="{{ request.url_for('login_page') }}">Войти</a>
+    </div>
+  </main>
+</body>
+</html>

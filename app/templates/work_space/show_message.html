@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ message.title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/show_message.css') }}">
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>{{ message.title }}</h1>
+      <div class="meta">{{ message.date }}</div>
+      <div class="content">{{ message.text }}</div>
+      <div class="buttons">
+        <form method="post" action="{{ request.url_for('accept_message', message_id=message.id) }}">
+          <button class="btn primary" type="submit">Accept</button>
+        </form>
+        <form method="post" action="{{ request.url_for('reject_message', message_id=message.id) }}">
+          <button class="btn danger" type="submit">Reject</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="{{ url_for('static', path='js/message.js') }}"></script>
+</body>
+</html>

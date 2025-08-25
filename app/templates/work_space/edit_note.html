@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Update Note</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/update_note.css') }}">
+</head>
+<body>
+  <div class="wrap">
+    <h1>Update Note</h1>
+    <form id="updateNoteForm">
+      <label for="title">Title</label>
+      <input type="text" id="title" name="title" placeholder="Title" value="{{ note.title }}" required />
+
+      <label for="content">Content</label>
+      <textarea id="content" name="content" placeholder="Note content" required>{{ note.content }}</textarea>
+      
+      <div class="actions">
+        <a class="btn ghost" href="{{ request.url_for('notes') }}">Back</a>
+        <button class="btn primary" type="submit">Update</button>
+      </div>
+    </form>
+  </div>
+  <script src="{{ url_for('static', path='js/update_note.js') }}"></script>
+</body>
+</html>

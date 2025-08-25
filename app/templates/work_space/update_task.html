@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Edit Task</title>
+<link rel="stylesheet" href="{{ url_for('static', path='css/update_task.css') }}">
+</head>
+<body>
+<div class="wrap">
+  <h1>Edit Task</h1>
+  <form id="taskForm">
+    <input type="text" name="title" placeholder="Title" value="{{ task.title }}" required />
+    <textarea name="description" rows="5" placeholder="Task description">{{ task.description }}</textarea>
+    <label>
+      Due date:
+      <input type="datetime-local" name="due_date"
+        value="{{ task.due_date.strftime('%Y-%m-%dT%H:%M') if task.due_date else '' }}" />
+    </label>
+    <button type="submit">Save</button>
+  </form>
+  <p><a href="{{ request.url_for('tasks') }}">← Back to Tasks</a></p>
+</div>
+<script src="{{ url_for('static', path='js/edit_task.js') }}"></script>
+</body>
+</html>

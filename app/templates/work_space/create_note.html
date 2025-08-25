@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Add Note</title>
+<link rel="stylesheet" href="{{ url_for('static', path='css/create_note.css') }}">
+</head>
+<body>
+<div class="wrap">
+    <h1>New Note</h1>
+    <form id="noteForm">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" placeholder="Enter note title" required />
+
+        <label for="content">Content</label>
+        <textarea id="content" name="content" rows="6" placeholder="Write your note here..." required></textarea>
+
+        <button type="submit">Create</button>
+    </form>
+    <p class="back-link"><a href="{{ request.url_for('notes') }}">← Back to notes</a></p>
+</div>
+<script src="{{ url_for('static', path='js/create_note.js') }}"></script>
+</body>
+</html>

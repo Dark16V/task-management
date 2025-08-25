@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ title or 'Tasks Board' }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/tasks.css') }}">
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1 style="margin:0">Tasks Board</h1>
+        <div class="small">Track your tasks and progress</div>
+      </div>
+
+      <div class="controls">
+        <nav class="tabs" aria-label="Navigation">
+          <a class="tab" href="{{ request.url_for('notes') }}">Notes</a>
+          <a class="tab active" href="{{ request.url_for('tasks') }}">Tasks</a>
+        </nav>
+        <a class="btn ghost" href="{{ request.url_for('add_task') }}">Add Task</a>
+        <form method="post" action="{{ request.url_for('logout') }}">
+          <button class="btn" type="submit">Logout</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div>
+        {% if tasks and tasks|length > 0 %}
+          <div class="grid" id="tasks-grid">
+            {% for task in tasks %}
+              <article class="card">
+                <div>
+                  <h3>{{ task.title }}</h3>
+                  {% if task.due_date %}
+                      {% set delta = task.due_date - now %}
+                        {% if delta.total_seconds() > 0 %}
+                            <div class="meta">Time left: {{ delta.days }}d {{ delta.seconds // 3600 }}h {{ (delta.seconds // 60) % 60 }}m</div>
+                        {% else %}
+                            <div class="meta" style="color:var(--danger)">Deadline passed</div>
+                        {% endif %}
+                  {% endif %}
+
+                  <div class="meta">Created: {{ task.created_at }}</div>
+                  <div class="content">{{ task.description }}</div>
+                </div>
+
+                <div class="card-actions">
+                  <a href="{{ request.url_for('view_task', task_id=task.id) }}" class="btn ghost">👁</a>
+                  <form method="post" action="{{ request.url_for('delete_task', task_id=task.id) }}" onsubmit="return confirm('Delete task?')">
+                    <button class="btn danger" type="submit">✕</button>
+                  </form>
+                  {% if not task.completed %}
+                  <form method="post" action="{{ request.url_for('complete_task', task_id=task.id) }}">
+                    <button class="btn success" type="submit">✅ Complete</button>
+                  </form>
+                  {% else %}
+                    <span style="color:var(--muted);padding:.3rem .6rem;border-radius:8px;background:rgba(16,185,129,.2)">Completed</span>
+                  {% endif %}
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty">
+            <p>You don't have any tasks yet. Click "Add Task" to create your first one.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <aside class="messages-panel">
+        <h3>Messages</h3>
+        {% if messages and messages|length > 0 %}
+          {% for msg in messages %}
+            <div class="message-item" onclick="location.href='/view/message/{{ msg.id }}'">
+              <div class="msg-title">{{ msg.title[:20] ~ ('...' if msg.title|length > 20 else '') }}</div>
+              <div class="msg-meta">{{ msg.created_at }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="small">No messages</div>
+        {% endif %}
+      </aside>
+    </div>
+  </div>
+</body>
+</html>
