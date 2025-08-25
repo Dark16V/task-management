@@ -9,6 +9,7 @@ from app.db.database import get_db
 from app.auth.utils import try_get_user
 from app.schemas import NoteSchema
 from app.utils.get import get_note
+from app.utils.update import note_update
 
 
 router = APIRouter()
@@ -32,12 +33,9 @@ async def update_note(
     db: AsyncSession = Depends(get_db)
 ):
     note = await get_note(db=db, id=note_id)
-    
     if not note:
         return RedirectResponse(url="/dashboard/notes", status_code=404)
     
-    note.title = data.title
-    note.content = data.content
-    await db.commit()
+    await note_update(note, title=data.title, content=data.content, db=db)
     
     return RedirectResponse(url=f"/note/{note_id}", status_code=303)

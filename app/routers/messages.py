@@ -10,6 +10,7 @@ from app.auth.utils import try_get_user
 from app.models.message import Message
 from app.utils.get import get_message, get_task
 from app.utils.create import create_message
+from app.utils.update import task_update
 
 
 router = APIRouter()
@@ -54,8 +55,7 @@ async def accept_message(message_id: int, request: Request, db: AsyncSession = D
 
     if message.task_id:
         task = await get_task(db=db, id=message.task_id)
-        task.visible = True
-
+        await task_update(task, visible=True, db=db)
         await create_message(db=db, 
                              sender_id=message.receiver_id, 
                              receiver_id=message.sender_id, 

@@ -10,6 +10,7 @@ from app.auth.utils import try_get_user
 from datetime import datetime
 from app.schemas import TaskSchema
 from app.utils.get import get_task
+from app.utils.update import task_update
 
 
 router = APIRouter()
@@ -28,17 +29,14 @@ async def update_task(request: Request, task_id: int, db: AsyncSession = Depends
 @router.post("/task/update/{task_id}")
 async def update_task(
     task_id: int,
-    date: TaskSchema,
+    data: TaskSchema,
     db: AsyncSession = Depends(get_db)
 ):
     task = await get_task(db=db, id=task_id)
-    
     due_dt = None
-    if date.due_date:
-        due_dt = datetime.strptime(date.due_date, "%Y-%m-%dT%H:%M")
+    if data.due_date:
+        due_dt = datetime.strptime(data.due_date, "%Y-%m-%dT%H:%M")
 
-    task.title = date.title
-    task.description = date.description
-    task.due_date = due_dt
-    await db.commit()
+    await task_update(task, title=data.title, description=data.description, due_date=due_dt, db=db)
+
     return RedirectResponse(url="/dashboard/tasks", status_code=303)
