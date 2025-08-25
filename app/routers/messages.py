@@ -38,6 +38,21 @@ async def reject_message(message_id: int, request: Request, db: AsyncSession = D
         select(Message).where(Message.id == message_id, Message.receiver_id == user.id)
     )
     message = message.scalar_one_or_none()
+
+    if message.task_id:
+
+        task = await db.execute(
+            select(Task).where(Task.id == message.task_id)
+        )
+        task = task.scalar_one_or_none()
+
+        new_message = Message(
+            sender_id=message.receiver_id,
+            receiver_id=message.sender_id,
+            title=f'User {user.username} did not accept your task "{task.title}"'
+        )
+        db.add(new_message)
+        await db.delete(task)
     
     await db.delete(message)
     await db.commit()
@@ -48,16 +63,27 @@ async def reject_message(message_id: int, request: Request, db: AsyncSession = D
 
 @router.post('/accept/message/{message_id}')
 async def accept_message(message_id: int, request: Request, db: AsyncSession = Depends(get_db)):
+    user = await try_get_user(request, db)
     message = await db.execute(
         select(Message).where(Message.id == message_id)
     )
     message = message.scalar_one_or_none()
     
-    task = await db.execute(
-        select(Task).where(Task.id == message.task_id)
-    )
-    task = task.scalar_one_or_none()
-    task.visible = True
+    if message.task_id:
+
+        task = await db.execute(
+            select(Task).where(Task.id == message.task_id)
+        )
+        task = task.scalar_one_or_none()
+        task.visible = True
+
+        new_message = Message(
+            sender_id=message.receiver_id,
+            receiver_id=message.sender_id,
+            title=f"User {user.username} accept your task {task.title}"
+        )
+        db.add(new_message)
+
     await db.delete(message)
     await db.commit()
 

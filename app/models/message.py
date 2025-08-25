@@ -11,8 +11,11 @@ class Message(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     sender_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     receiver_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    task_id: Mapped[int] = mapped_column(ForeignKey("tasks.id"), nullable=False)
+    task_id: Mapped[int] = mapped_column(ForeignKey("tasks.id"), nullable=True)
     title: Mapped[str] = mapped_column(String, nullable=False)
     date: Mapped[datetime.datetime] = mapped_column(
         DateTime, default=datetime.datetime.utcnow, nullable=False
     )
+
+
+
