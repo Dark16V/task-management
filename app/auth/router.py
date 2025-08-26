@@ -12,8 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.users import User  
 from app.auth.utils import authenticate_user, create_access_token
-from app.auth.schemas import RegisterSchema
+from app.auth.schemas import RegisterSchema, LoginSchema
 from app.utils.get import get_user
+from fastapi.responses import JSONResponse
 
 
 router = APIRouter(tags=["auth"])
@@ -44,12 +45,6 @@ async def register(
     data: RegisterSchema,
     db: AsyncSession = Depends(get_db)
 ):
-    if data.password != data.confirm_password:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Passwords do not match"
-        )
-
 
     existing_user = await get_user(db=db, email=data.email)
     if existing_user:
@@ -73,29 +68,36 @@ async def register(
 
     access_token = create_access_token(data={"sub": new_user.username}, expires_delta=timedelta(minutes=30))
     response = RedirectResponse(url="/dashboard/notes", status_code=302)
-    response.set_cookie("Authorization", access_token, httponly=True)
+    response.set_cookie(
+        "Authorization", 
+        access_token, 
+        httponly=True
+    )
     return response
 
 
 @router.post("/login")
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), 
+    form_data: LoginSchema, 
     db: AsyncSession = Depends(get_db)
 ):
     user = await authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
+            detail="Invalid username or password",
             headers={"WWW-Authenticate": "Bearer"},
         ) 
     
-    access_token = create_access_token(data={"sub": user.username}, expires_delta=timedelta(minutes=30))
+    access_token = create_access_token(
+        data={"sub": user.username},
+        expires_delta=timedelta(minutes=30)
+    )
     
-    response = RedirectResponse(url="/dashboard/notes", status_code=302)
+    response = JSONResponse({"redirect": "/dashboard/notes"})
     response.set_cookie(
-        key="Authorization", 
-        value=access_token, 
+        key="Authorization",
+        value=access_token,
         httponly=True
     )
     return response

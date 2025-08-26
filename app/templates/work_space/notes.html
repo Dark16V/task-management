@@ -21,7 +21,7 @@
         </nav>
 
         <a class="btn ghost" href="{{ request.url_for('add_note') }}">Add Note</a>
-        <form method="get" action="{{ request.url_for('logout') }}">
+        <form method="post" action="{{ request.url_for('logout') }}">
           <button class="btn" type="submit">Logout</button>
         </form>
       </div>

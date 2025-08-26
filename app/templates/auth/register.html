@@ -2,70 +2,394 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Регистрация</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: system-ui, sans-serif; display: grid; place-items:center; min-height:100vh; background:#f6f7f9; }
-    form { background:#fff; padding:28px; border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,.08); width:min(92vw,420px); }
-    h1 { font-size:22px; margin-bottom:20px; text-align:center; }
-    label { display:block; margin-top:12px; font-size:14px; font-weight:600; }
-    input { width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-top:4px; }
-    button { margin-top:20px; width:100%; padding:12px; border:none; border-radius:10px; background:#2563eb; color:#fff; font-size:16px; font-weight:600; cursor:pointer; }
-    button:hover { background:#1d4ed8; }
-    .link { display:block; margin-top:12px; text-align:center; }
+    :root {
+      --bg: #0b1020;
+      --card: #0f1724;
+      --muted: #9aa3b2;
+      --accent: #3b82f6;
+      --danger: #ef4444;
+      --success: #10b981;
+      --input-bg: #1a2332;
+      --input-border: rgba(255,255,255,.08);
+      --input-border-focus: rgba(59,130,246,.4);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: #e6eef8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .form-card {
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(2,6,23,.8);
+      border: 1px solid rgba(255,255,255,.04);
+    }
+
+    .form-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .form-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      background: linear-gradient(135deg, #e6eef8 0%, var(--muted) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .form-subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #e6eef8;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: #e6eef8;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--input-border-focus);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+    }
+
+    .form-input::placeholder {
+      color: var(--muted);
+    }
+
+    .error-message {
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent) 0%, #2563eb 100%);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 1rem;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59,130,246,.3);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .global-error {
+      color: var(--danger);
+      text-align: center;
+      margin: 1rem 0;
+      font-weight: 500;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .global-error.show {
+      display: block;
+    }
+
+    .success-message {
+      color: var(--success);
+      text-align: center;
+      margin: 1rem 0;
+      font-weight: 500;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .success-message.show {
+      display: block;
+    }
+
+    .form-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,.04);
+    }
+
+    .login-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s ease;
+    }
+
+    .login-link:hover {
+      color: var(--accent);
+    }
+
+    .login-link .accent {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .loading-spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 0.5rem;
+    }
+
+    .loading-spinner.show {
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 480px) {
+      .form-card {
+        padding: 1.5rem;
+        margin: 0.5rem;
+      }
+      
+      .form-title {
+        font-size: 1.5rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <form id="registerForm">
-    <h1>Регистрация</h1>
+  <div class="container">
+    <div class="form-card">
+      <div class="form-header">
+        <h1 class="form-title">Create Account</h1>
+        <p class="form-subtitle">Fill out the form to register</p>
+      </div>
 
-    <label for="email">Email</label>
-    <input type="email" name="email" id="email" required>
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <input 
+            type="email" 
+            name="email" 
+            id="email" 
+            class="form-input"
+            placeholder="example@email.com"
+            required
+          >
+          <div class="error-message" id="emailError"></div>
+        </div>
 
-    <label for="username">Никнейм</label>
-    <input type="text" name="username" id="username" required>
+        <div class="form-group">
+          <label for="username" class="form-label">Username</label>
+          <input 
+            type="text" 
+            name="username" 
+            id="username" 
+            class="form-input"
+            placeholder="Your username"
+            required
+          >
+          <div class="error-message" id="usernameError"></div>
+        </div>
 
-    <label for="password">Пароль</label>
-    <input type="password" name="password" id="password" required>
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input 
+            type="password" 
+            name="password" 
+            id="password" 
+            class="form-input"
+            placeholder="Minimum 6 characters"
+            required
+          >
+          <div class="error-message" id="passwordError"></div>
+        </div>
 
-    <label for="confirm_password">Подтверждение пароля</label>
-    <input type="password" name="confirm_password" id="confirm_password" required>
+        <div class="form-group">
+          <label for="confirm_password" class="form-label">Confirm Password</label>
+          <input 
+            type="password" 
+            name="confirm_password" 
+            id="confirm_password" 
+            class="form-input"
+            placeholder="Repeat password"
+            required
+          >
+          <div class="error-message" id="confirm_passwordError"></div>
+        </div>
 
-    <button type="submit">Зарегистрироваться</button>
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span class="loading-spinner" id="loadingSpinner"></span>
+          <span id="submitText">Register</span>
+        </button>
 
-    <a class="link" href="/login">Уже есть аккаунт? Войти</a>
-  </form>
+        <div class="global-error" id="globalError"></div>
+        <div class="success-message" id="successMsg"></div>
+      </form>
+
+      <div class="form-footer">
+        <a href="/login" class="login-link">
+          Already have an account? <span class="accent">Sign In</span>
+        </a>
+      </div>
+    </div>
+  </div>
 
   <script>
     const form = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    const loadingSpinner = document.getElementById('loadingSpinner');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const data = {
-        email: form.email.value,
-        username: form.username.value,
+        email: form.email.value.trim(),
+        username: form.username.value.trim(),
         password: form.password.value,
         confirm_password: form.confirm_password.value
       };
 
+      // Clear previous errors
+      document.querySelectorAll(".error-message").forEach(e => {
+        e.textContent = "";
+        e.classList.remove('show');
+      });
+      
+      const globalError = document.getElementById("globalError");
+      const successMsg = document.getElementById("successMsg");
+      globalError.classList.remove('show');
+      successMsg.classList.remove('show');
+
+      // Show loading state
+      submitBtn.disabled = true;
+      loadingSpinner.classList.add('show');
+      submitText.textContent = 'Registering...';
+
       try {
         const response = await fetch('/register', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
 
-        if (response.redirected) {
-          window.location.href = response.url;
-        } else if (!response.ok) {
-          const error = await response.json();
-          alert(error.detail || 'Ошибка при регистрации');
+        if (response.ok) {
+          // Check if response is a redirect
+          if (response.redirected || response.status === 302) {
+            // Redirect was successful, go to dashboard
+            window.location.href = '/dashboard/notes';
+            return;
+          }
+          
+          // Handle JSON success response
+          const result = await response.json();
+          successMsg.textContent = result.message || 'Registration successful!';
+          successMsg.classList.add('show');
+          form.reset();
+        } else {
+          const errorData = await response.json();
+          
+          if (errorData.detail && Array.isArray(errorData.detail)) {
+            // Handle Pydantic validation errors
+            errorData.detail.forEach(err => {
+              const loc = err.loc;
+              if (loc && loc.length > 1) {
+                const field = loc[1];
+                const errorElement = document.getElementById(field + 'Error');
+                if (errorElement) {
+                  errorElement.textContent = err.msg || 'Validation error';
+                  errorElement.classList.add('show');
+                }
+              } else {
+                globalError.textContent = err.msg || 'Registration failed';
+                globalError.classList.add('show');
+              }
+            });
+          } else if (errorData.detail && typeof errorData.detail === 'string') {
+            // Handle HTTPException errors (like "Email is already registered")
+            globalError.textContent = errorData.detail;
+            globalError.classList.add('show');
+          } else {
+            globalError.textContent = errorData.message || 'Registration failed';
+            globalError.classList.add('show');
+          }
         }
       } catch (err) {
-        alert('Ошибка сети или сервера');
+        globalError.textContent = "Network or server error";
+        globalError.classList.add('show');
         console.error(err);
+      } finally {
+        // Hide loading state
+        submitBtn.disabled = false;
+        loadingSpinner.classList.remove('show');
+        submitText.textContent = 'Register';
       }
     });
   </script>
